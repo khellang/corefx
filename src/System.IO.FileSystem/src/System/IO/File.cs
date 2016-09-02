@@ -564,6 +564,53 @@ namespace System.IO
             return lines.ToArray();
         }
 
+        public static Task<String[]> ReadAllLinesAsync(String path, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalReadAllLinesAsync(path, Encoding.UTF8, cancellationToken);
+        }
+
+        public static Task<String[]> ReadAllLinesAsync(String path, Encoding encoding, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalReadAllLinesAsync(path, encoding, cancellationToken);
+        }
+
+        private static async Task<String[]> InternalReadAllLinesAsync(String path, Encoding encoding, CancellationToken cancellationToken)
+        {
+            Contract.Requires(path != null);
+            Contract.Requires(encoding != null);
+            Contract.Requires(path.Length != 0);
+
+            String line;
+            List<String> lines = new List<String>();
+
+            Stream stream = FileStream.InternalOpen(path, useAsync: true);
+
+            using (StreamReader sr = new StreamReader(stream, encoding))
+            {
+                while ((line = await sr.ReadLineAsync()) != null)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    lines.Add(line);
+                }
+            }
+
+            return lines.ToArray();
+        }
+
         public static IEnumerable<String> ReadLines(String path)
         {
             if (path == null)
