@@ -53,14 +53,14 @@ namespace System.IO
 
 
         // Copies an existing file to a new file. An exception is raised if the
-        // destination file already exists. Use the 
-        // Copy(String, String, boolean) method to allow 
+        // destination file already exists. Use the
+        // Copy(String, String, boolean) method to allow
         // overwriting an existing file.
         //
         // The caller must have certain FileIOPermissions.  The caller must have
         // Read permission to sourceFileName and Create
         // and Write permissions to destFileName.
-        // 
+        //
         public static void Copy(String sourceFileName, String destFileName)
         {
             if (sourceFileName == null)
@@ -76,15 +76,15 @@ namespace System.IO
             InternalCopy(sourceFileName, destFileName, false);
         }
 
-        // Copies an existing file to a new file. If overwrite is 
-        // false, then an IOException is thrown if the destination file 
-        // already exists.  If overwrite is true, the file is 
+        // Copies an existing file to a new file. If overwrite is
+        // false, then an IOException is thrown if the destination file
+        // already exists.  If overwrite is true, the file is
         // overwritten.
         //
         // The caller must have certain FileIOPermissions.  The caller must have
-        // Read permission to sourceFileName 
+        // Read permission to sourceFileName
         // and Write permissions to destFileName.
-        // 
+        //
         public static void Copy(String sourceFileName, String destFileName, bool overwrite)
         {
             if (sourceFileName == null)
@@ -121,26 +121,26 @@ namespace System.IO
 
 
         // Creates a file in a particular path.  If the file exists, it is replaced.
-        // The file is opened with ReadWrite access and cannot be opened by another 
-        // application until it has been closed.  An IOException is thrown if the 
+        // The file is opened with ReadWrite access and cannot be opened by another
+        // application until it has been closed.  An IOException is thrown if the
         // directory specified doesn't exist.
         //
         // Your application must have Create, Read, and Write permissions to
         // the file.
-        // 
+        //
         public static FileStream Create(String path)
         {
             return Create(path, FileStream.DefaultBufferSize);
         }
 
         // Creates a file in a particular path.  If the file exists, it is replaced.
-        // The file is opened with ReadWrite access and cannot be opened by another 
-        // application until it has been closed.  An IOException is thrown if the 
+        // The file is opened with ReadWrite access and cannot be opened by another
+        // application until it has been closed.  An IOException is thrown if the
         // directory specified doesn't exist.
         //
         // Your application must have Create, Read, and Write permissions to
         // the file.
-        // 
+        //
         public static FileStream Create(String path, int bufferSize)
         {
             return new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None, bufferSize);
@@ -151,16 +151,16 @@ namespace System.IO
             return new FileStream(path, FileMode.Create, FileAccess.ReadWrite,
                                   FileShare.None, bufferSize, options);
         }
- 
+
         // Deletes a file. The file specified by the designated path is deleted.
         // If the file does not exist, Delete succeeds without throwing
         // an exception.
-        // 
+        //
         // On NT, Delete will fail for a file that is open for normal I/O
-        // or a file that is memory mapped.  
-        // 
+        // or a file that is memory mapped.
+        //
         // Your application must have Delete permission to the target file.
-        // 
+        //
         [System.Security.SecuritySafeCritical]
         public static void Delete(String path)
         {
@@ -180,7 +180,7 @@ namespace System.IO
         // Exists will return true.
         //
         // Your application must have Read permission for the target directory.
-        // 
+        //
         [System.Security.SecuritySafeCritical]
         public static bool Exists(String path)
         {
@@ -235,7 +235,7 @@ namespace System.IO
 
         internal static DateTimeOffset GetUtcDateTimeOffset(DateTime dateTime)
         {
-            // File and Directory UTC APIs treat a DateTimeKind.Unspecified as UTC whereas 
+            // File and Directory UTC APIs treat a DateTimeKind.Unspecified as UTC whereas
             // ToUniversalTime treats this as local.
             if (dateTime.Kind == DateTimeKind.Unspecified)
             {
@@ -966,10 +966,10 @@ namespace System.IO
         // This method does work across volumes.
         //
         // The caller must have certain FileIOPermissions.  The caller must
-        // have Read and Write permission to 
-        // sourceFileName and Write 
+        // have Read and Write permission to
+        // sourceFileName and Write
         // permissions to destFileName.
-        // 
+        //
         [System.Security.SecuritySafeCritical]
         public static void Move(String sourceFileName, String destFileName)
         {
