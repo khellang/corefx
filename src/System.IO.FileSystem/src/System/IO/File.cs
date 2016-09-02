@@ -12,7 +12,7 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
 
 namespace System.IO
@@ -632,6 +632,42 @@ namespace System.IO
 
             using (StreamWriter sw = new StreamWriter(stream, encoding))
                 sw.Write(contents);
+        }
+
+        public static Task AppendAllTextAsync(String path, String contents)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalAppendAllTextAsync(path, contents, UTF8NoBOM);
+        }
+
+        public static Task AppendAllTextAsync(String path, String contents, Encoding encoding)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalAppendAllTextAsync(path, contents, encoding);
+        }
+
+        private static async Task InternalAppendAllTextAsync(String path, String contents, Encoding encoding)
+        {
+            Contract.Requires(path != null);
+            Contract.Requires(encoding != null);
+            Contract.Requires(path.Length > 0);
+
+            Stream stream = FileStream.InternalAppend(path, useAsync: true);
+
+            using (StreamWriter sw = new StreamWriter(stream, encoding))
+                await sw.WriteAsync(contents);
         }
 
         public static void AppendAllLines(String path, IEnumerable<String> contents)
