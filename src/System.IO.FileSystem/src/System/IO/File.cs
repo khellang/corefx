@@ -597,6 +597,21 @@ namespace System.IO
             }
         }
 
+        private static async Task InternalWriteAllLinesAsync(TextWriter writer, IEnumerable<String> contents, CancellationToken cancellationToken)
+        {
+            Contract.Requires(writer != null);
+            Contract.Requires(contents != null);
+
+            using (writer)
+            {
+                foreach (String line in contents)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    await writer.WriteLineAsync(line);
+                }
+            }
+        }
 
         public static void AppendAllText(String path, String contents)
         {
@@ -700,6 +715,38 @@ namespace System.IO
             Stream stream = FileStream.InternalAppend(path, useAsync: false);
 
             InternalWriteAllLines(new StreamWriter(stream, encoding), contents);
+        }
+
+        public static Task AppendAllLinesAsync(String path, IEnumerable<String> contents, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (contents == null)
+                throw new ArgumentNullException(nameof(contents));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            Stream stream = FileStream.InternalAppend(path, useAsync: true);
+
+            return InternalWriteAllLinesAsync(new StreamWriter(stream, UTF8NoBOM), contents, cancellationToken);
+        }
+
+        public static Task AppendAllLinesAsync(String path, IEnumerable<String> contents, Encoding encoding, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (contents == null)
+                throw new ArgumentNullException(nameof(contents));
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            Stream stream = FileStream.InternalAppend(path, useAsync: true);
+
+            return InternalWriteAllLinesAsync(new StreamWriter(stream, encoding), contents, cancellationToken);
         }
 
         // Moves a specified file to a new location and potentially a new file name.
