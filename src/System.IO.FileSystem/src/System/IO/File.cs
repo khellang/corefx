@@ -459,6 +459,43 @@ namespace System.IO
             }
         }
 
+        public static Task<byte[]> ReadAllBytesAsync(String path, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalReadAllBytesAsync(path, cancellationToken);
+        }
+
+        private static async Task<byte[]> InternalReadAllBytesAsync(String path, CancellationToken cancellationToken)
+        {
+            Contract.Requires(path != null);
+
+            // bufferSize == 1 used to avoid unnecessary buffer in FileStream
+            using (FileStream fs = FileStream.InternalOpen(path, bufferSize: 1, useAsync: true))
+            {
+                long fileLength = fs.Length;
+                if (fileLength > Int32.MaxValue)
+                    throw new IOException(SR.IO_FileTooLong2GB);
+
+                int index = 0;
+                int count = (int)fileLength;
+                byte[] bytes = new byte[count];
+                while (count > 0)
+                {
+                    int n = await fs.ReadAsync(bytes, index, count, cancellationToken);
+                    if (n == 0)
+                        throw Error.GetEndOfFile();
+                    index += n;
+                    count -= n;
+                }
+                return bytes;
+            }
+        }
+
         [System.Security.SecuritySafeCritical]  // auto-generated
         public static void WriteAllBytes(String path, byte[] bytes)
         {
