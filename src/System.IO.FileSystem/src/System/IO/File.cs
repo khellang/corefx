@@ -558,6 +558,32 @@ namespace System.IO
                 fs.Write(bytes, 0, bytes.Length);
             }
         }
+
+        public static Task WriteAllBytesAsync(String path, byte[] bytes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path), SR.ArgumentNull_Path);
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+            Contract.EndContractBlock();
+
+            return InternalWriteAllBytesAsync(path, bytes, cancellationToken);
+        }
+
+        private static async Task InternalWriteAllBytesAsync(String path, byte[] bytes, CancellationToken cancellationToken)
+        {
+            Contract.Requires(path != null);
+            Contract.Requires(path.Length != 0);
+            Contract.Requires(bytes != null);
+
+            using (FileStream fs = FileStream.InternalCreate(path, useAsync: true))
+            {
+                await fs.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+            }
+        }
+
         public static String[] ReadAllLines(String path)
         {
             if (path == null)
