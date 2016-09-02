@@ -464,6 +464,42 @@ namespace System.IO
                 sw.Write(contents);
         }
 
+        public static Task WriteAllTextAsync(String path, String contents)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalWriteAllTextAsync(path, contents, UTF8NoBOM);
+        }
+
+        public static Task WriteAllTextAsync(String path, String contents, Encoding encoding)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+            if (path.Length == 0)
+                throw new ArgumentException(SR.Argument_EmptyPath, nameof(path));
+            Contract.EndContractBlock();
+
+            return InternalWriteAllTextAsync(path, contents, encoding);
+        }
+
+        private static async Task InternalWriteAllTextAsync(String path, String contents, Encoding encoding)
+        {
+            Contract.Requires(path != null);
+            Contract.Requires(encoding != null);
+            Contract.Requires(path.Length > 0);
+
+            Stream stream = FileStream.InternalCreate(path, useAsync: true);
+
+            using (StreamWriter sw = new StreamWriter(stream, encoding))
+                await sw.WriteAsync(contents);
+        }
+
         [System.Security.SecuritySafeCritical]  // auto-generated
         public static byte[] ReadAllBytes(String path)
         {
